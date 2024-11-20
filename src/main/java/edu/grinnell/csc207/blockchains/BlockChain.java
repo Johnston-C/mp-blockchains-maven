@@ -62,6 +62,10 @@ public class BlockChain implements Iterable<Transaction> {
    *
    * @param blk
    *   The block to add to the end of the chain.
+   *
+   * @throws IllegalArgumentException if (a) the hash is not valid, (b)
+   *   the hash is not appropriate for the contents, or (c) the previous
+   *   hash is incorrect.
    */
   public void append(Block blk) {
     // STUB
@@ -98,6 +102,19 @@ public class BlockChain implements Iterable<Transaction> {
   public boolean isCorrect() {
     return true;        // STUB
   } // isCorrect()
+
+  /**
+   * Determine if the blockchain is correct in that (a) the balances are
+   * legal/correct at every step, (b) that every block has a correct
+   * previous hash field, (c) that every block has a hash that is correct
+   * for its contents, and (d) that every block has a valid hash.
+   *
+   * @throws Exception
+   *   If things are wrong at any block.
+   */
+  public void check() throws Exception {
+    // STUB
+  } // check()
 
   /**
    * Return an iterator of all the people who participated in the
