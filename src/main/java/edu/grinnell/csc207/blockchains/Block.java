@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-
 /**
  * Blocks to be stored in blockchains.
  *
@@ -17,25 +16,25 @@ public class Block {
   // | Fields |
   // +--------+
 
-  /**number of the block */
+  /** The number of the block */
   private int num;
-  
-  /**This is the transaction of the block.*/
+
+  /** This is the transaction of the block.*/
   private Transaction transaction;
-  
-  /**This is the Previous hash of the block*/
+
+  /** This is the Previous hash of the block*/
   private Hash prevHash;
-  
-  /**This is the block's own hash. */
+
+  /** This is the block's own hash. */
   private Hash ownHash;
-  
-  /**This is the nonce of the block. */
+
+  /** This is the nonce of the block. */
   private long nonce;
-  
-  /**this is the int buffer for the computeHash. */
+
+  /** An int buffer for the computeHash. */
   private ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
-  
-  /**byte buffer used for longs */
+
+  /** A byte buffer used for longs */
   private ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
 
   // +--------------+------------------------------------------------
@@ -94,15 +93,31 @@ public class Block {
   // | Helpers |
   // +---------+
 
+  /**
+   * Convert an integer into bytes.
+   *
+   * @param n
+   *   The integer to convert into bytes.
+   * @return
+   *   The integer as bytes.
+   */
   private byte[] intAsBytes(int n){
     intBuffer.clear();
     return intBuffer.putInt(n).array();
-  }
+  } // intAsBytes(int)
 
+  /**
+   * Convert a long into bytes.
+   *
+   * @param n
+   *   The long to convert into bytes.
+   * @return
+   *   The long as bytes.
+   */
   private byte[] longAsBytes(long n){
     longBuffer.clear();
     return longBuffer.putLong(n).array();
-  }
+  } // longAsBytes(long)
 
   /**
    * Compute the hash of the block given all the other info already
@@ -178,6 +193,7 @@ public class Block {
    *
    * @return a string representation of the block.
    */
+  @Override
   public String toString() {
     String output = "Block " + this.num + " (Transaction: [";
     if(this.transaction.getSource().equals("")){
