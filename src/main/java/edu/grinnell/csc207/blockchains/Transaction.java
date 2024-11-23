@@ -85,6 +85,7 @@ public class Transaction {
    *    Amount: amounts] if the source is nonempty. Otherwise, returns
    *    a string in the form [Deposit, Target: target, Amount: amount].
    */
+  @Override
   public String toString() {
     return String.format("[%s, Target: %s, Amount: %s]",
         ("".equals(this.source)) ? "Deposit" : "Source: " + this.source,
@@ -97,6 +98,7 @@ public class Transaction {
    *
    * @return the hash code.
    */
+  @Override
   public int hashCode() {
     return this.toString().hashCode();
   } // hashCode()
@@ -110,6 +112,7 @@ public class Transaction {
    * @return true if the other object is a Transaction with the
    *   same fields.
    */
+  @Override
   public boolean equals(Object other) {
     return (other instanceof Transaction)
         && this.equals((Transaction) other);

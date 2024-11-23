@@ -20,7 +20,7 @@ public class Block {
   private int num;
 
   /** This is the transaction of the block.*/
-  private Transaction transaction;
+  Transaction transaction;
 
   /** This is the Previous hash of the block*/
   private Hash prevHash;
@@ -29,7 +29,7 @@ public class Block {
   private Hash ownHash;
 
   /** This is the nonce of the block. */
-  private long nonce;
+  long nonce;
 
   /** An int buffer for the computeHash. */
   private ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
