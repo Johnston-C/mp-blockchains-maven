@@ -194,7 +194,7 @@ public class BlockChain implements Iterable<Transaction> {
           balance += block.getTransaction().getAmount();
         } // if
         if (balance < 0) {
-          if (errorIndex < block.getNum()) {
+          if ((errorIndex > block.getNum()) || (errorIndex == -1)) {
             errorString = "User \"" + user + "\" had a negative balance after block "
                 + block.getNum() + ".";
             errorIndex = block.getNum();
@@ -212,7 +212,7 @@ public class BlockChain implements Iterable<Transaction> {
       if (nextBlock.getPrevHash().equals(lastBlock.getHash())) {
         lastBlock = nextBlock;
       } else {
-        if (errorIndex < lastBlock.getNum()) {
+        if ((errorIndex > lastBlock.getNum()) || (errorIndex == -1)) {
           errorString = "Block " + lastBlock.getNum()
               + " has a prevHash that is different from block "
               + nextBlock.getNum() + "'s ownHash.";
@@ -227,7 +227,7 @@ public class BlockChain implements Iterable<Transaction> {
     while ((noError) && (blocks.hasNext())) {
       lastBlock = blocks.next();
       if (lastBlock.getTransaction().getAmount() < 0) {
-        if (errorIndex < lastBlock.getNum()) {
+        if ((errorIndex > lastBlock.getNum()) || (errorIndex == -1)) {
           errorString = "Block " + lastBlock.getNum()
               + " has a negative amount for its transaction.";
           errorIndex = lastBlock.getNum();
@@ -248,7 +248,7 @@ public class BlockChain implements Iterable<Transaction> {
     while ((noError) && (blocks.hasNext())) {
       lastBlock = blocks.next();
       if (!(checker.isValid(lastBlock.getHash()))) {
-        if (errorIndex < lastBlock.getNum()) {
+        if ((errorIndex > lastBlock.getNum()) || (errorIndex == -1)) {
           errorString = "Block " + lastBlock.getNum() + " has an invalid hash.";
           errorIndex = lastBlock.getNum();
         } // if
@@ -343,10 +343,12 @@ public class BlockChain implements Iterable<Transaction> {
     return new Iterator<Block>() {
       Node<Block> cursor = null;
 
+      @Override
       public boolean hasNext() {
         return ((cursor == null) || (cursor.getNext() != null));
       } // hasNext()
 
+      @Override
       public Block next() {
         if (hasNext()) {
           if (cursor == null) {
@@ -367,14 +369,17 @@ public class BlockChain implements Iterable<Transaction> {
    *
    * @return an iterator for all the blocks in the chain.
    */
+  @Override
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
       Node<Block> cursor = null;
 
+      @Override
       public boolean hasNext() {
-        return ((cursor == null) || (cursor.getNext() == null));
+        return ((cursor == null) || (cursor.getNext() != null));
       } // hasNext()
 
+      @Override
       public Transaction next() {
         if (hasNext()) {
           if (cursor == null) {
