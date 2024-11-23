@@ -77,7 +77,7 @@ public class Hash {
   public String toString() {
     String output = "";
     for (int i = 0; i < length(); i++) {
-      if(data[i] >= 0) {
+      if (data[i] >= 0) {
         output += numToHex(data[i] / 16);
         output += numToHex(data[i] % 16);
       } else {
@@ -91,7 +91,7 @@ public class Hash {
   /**
    * Convert a number between 0 and 15 to its hex equivalent.
    * The output is a string.
-   * 
+   *
    * @param num1
    *   The number to convert from base 10 to base 16.
    * @return
@@ -99,7 +99,7 @@ public class Hash {
    *   (inclusive), return an empty string.
    */
   private String numToHex(int num1) {
-    switch (num1){
+    switch (num1) {
       case 0:
         return "0";
       case 1:
@@ -134,7 +134,7 @@ public class Hash {
         return "F";
       default:
         return "";
-    }
+    } // switch
   } // numToHex(int)
 
   /**

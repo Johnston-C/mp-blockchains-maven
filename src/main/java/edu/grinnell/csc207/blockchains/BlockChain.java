@@ -2,13 +2,14 @@ package edu.grinnell.csc207.blockchains;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import javax.swing.plaf.ColorUIResource;
+import java.util.Arrays;
 
 /**
  * A full blockchain.
  *
- * @author Your Name Here
+ * @author Cade Johnston
+ * @author Sunjae Kim
+ * @author Samuel A. Rebelsky
  */
 public class BlockChain implements Iterable<Transaction> {
   // +--------+------------------------------------------------------
@@ -40,13 +41,27 @@ public class BlockChain implements Iterable<Transaction> {
   public BlockChain(HashValidator check) {
     this.size = 1;
     this.checker = check;
-    this.first = new Node<Block>(new Block(0, new Transaction("", "", 0), new Hash(new byte[] {}), this.checker));
+    this.first = new Node<Block>(new Block(0, new Transaction("", "", 0),
+        new Hash(new byte[] {}), this.checker));
     this.last = this.first;
   } // BlockChain(HashValidator)
 
   // +---------+-----------------------------------------------------
   // | Helpers |
   // +---------+
+
+  /**
+   * Determine if a block's hash is incorrect, based on the fields it has.
+   *
+   * @param blk
+   *   The block to check.
+   * @return
+   *   If the block's hash is incorrect.
+   */
+  private boolean hashIncorrect(Block blk) {
+    return (!(new Block(blk.getNum(), blk.getTransaction(),
+        blk.getPrevHash(), blk.getNonce())).getHash().equals(blk.getHash()));
+  } // boolean
 
   // +---------+-----------------------------------------------------
   // | Methods |
@@ -87,12 +102,12 @@ public class BlockChain implements Iterable<Transaction> {
   public void append(Block blk) {
     if (checker.isValid(blk.getHash())) {
       if (this.last.getValue().getHash().equals(blk.getPrevHash())) {
-        if (mine(blk.getTransaction()).equals(blk)) {
+        if (hashIncorrect(blk)) {
+          throw new IllegalArgumentException("The hash is not appropriate for the contents.");
+        } else {
           size++;
           this.last.setNext(new Node<Block>(blk));
           this.last = this.last.getNext();
-        } else {
-          throw new IllegalArgumentException("The hash is not appropriate for the contents.");
         } // if / else
       } else {
         throw new IllegalArgumentException("The previous hash is incorrect.");
@@ -114,11 +129,12 @@ public class BlockChain implements Iterable<Transaction> {
       return false;
     } else {
       Node<Block> cursor = this.first;
-      while(cursor.getNext().getNext() != null) {
+      while (cursor.getNext().getNext() != null) {
         cursor = cursor.getNext();
       } // while
       this.last = cursor;
       this.last.setNext(null);
+      size--;
       return true;
     } // if / else
   } // removeLast()
@@ -141,7 +157,12 @@ public class BlockChain implements Iterable<Transaction> {
    * @return true if the blockchain is correct and false otherwise.
    */
   public boolean isCorrect() {
-    return true;        // STUB
+    try {
+      check();
+      return true;
+    } catch (Exception e) {
+      return false;
+    } // try / catch
   } // isCorrect()
 
   /**
@@ -154,7 +175,89 @@ public class BlockChain implements Iterable<Transaction> {
    *   If things are wrong at any block.
    */
   public void check() throws Exception {
-    // STUB
+    int balance;
+    Iterator<String> users = this.users();
+    int errorIndex = -1;
+    String errorString = "";
+    boolean noError;
+    while (users.hasNext()) {
+      noError = true;
+      String user = users.next();
+      balance = 0;
+      Iterator<Block> blocks = this.blocks();
+      while ((blocks.hasNext()) && (noError)) {
+        Block block = blocks.next();
+        if (block.getTransaction().getSource().equals(user)) {
+          balance -= block.getTransaction().getAmount();
+        } // if
+        if (block.getTransaction().getTarget().equals(user)) {
+          balance += block.getTransaction().getAmount();
+        } // if
+        if (balance < 0) {
+          if (errorIndex < block.getNum()) {
+            errorString = "User \"" + user + "\" had a negative balance after block "
+                + block.getNum() + ".";
+            errorIndex = block.getNum();
+          } // if
+          noError = false;
+        } // if
+      } // while
+    } // while
+    noError = true;
+    Iterator<Block> blocks = blocks();
+    Block lastBlock = blocks.next();
+    Block nextBlock;
+    while ((noError) && (blocks.hasNext())) {
+      nextBlock = blocks.next();
+      if (nextBlock.getPrevHash().equals(lastBlock.getHash())) {
+        lastBlock = nextBlock;
+      } else {
+        if (errorIndex < lastBlock.getNum()) {
+          errorString = "Block " + lastBlock.getNum()
+              + " has a prevHash that is different from block "
+              + nextBlock.getNum() + "'s ownHash.";
+          errorIndex = lastBlock.getNum();
+        } // if
+        noError = false;
+      } // if / else
+    } // while
+    blocks = blocks();
+    lastBlock = blocks.next();
+    noError = true;
+    while ((noError) && (blocks.hasNext())) {
+      lastBlock = blocks.next();
+      if (lastBlock.getTransaction().getAmount() < 0) {
+        if (errorIndex < lastBlock.getNum()) {
+          errorString = "Block " + lastBlock.getNum()
+              + " has a negative amount for its transaction.";
+          errorIndex = lastBlock.getNum();
+        } // if
+        noError = false;
+      } // if
+      if (hashIncorrect(lastBlock)) {
+        if (errorIndex < lastBlock.getNum()) {
+          errorString = "Block " + lastBlock.getNum() + " has an incorrect hash for its contents.";
+          errorIndex = lastBlock.getNum();
+        } // if
+        noError = false;
+      } // if
+    } // while
+    blocks = blocks();
+    lastBlock = blocks.next();
+    noError = true;
+    while ((noError) && (blocks.hasNext())) {
+      lastBlock = blocks.next();
+      if (!(checker.isValid(lastBlock.getHash()))) {
+        if (errorIndex < lastBlock.getNum()) {
+          errorString = "Block " + lastBlock.getNum() + " has an invalid hash.";
+          errorIndex = lastBlock.getNum();
+        } // if
+        noError = false;
+      } // if
+    } // while
+    if (errorIndex != -1) {
+      throw new Exception(errorString);
+    } // if
   } // check()
 
   /**
@@ -165,13 +268,46 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<String> users() {
     return new Iterator<String>() {
+      Node<Block> cursor = first;
+      String[] past = new String[]{""};
+
       public boolean hasNext() {
-        return false;   // STUB
+        while (this.cursor != null) {
+          if (isNew(this.cursor.getValue().getTransaction().getSource())) {
+            return true;
+          } // if
+          if (isNew(this.cursor.getValue().getTransaction().getTarget())) {
+            return true;
+          } // if
+          this.cursor = this.cursor.getNext();
+        } // while
+        return false;
       } // hasNext()
 
       public String next() {
-        throw new NoSuchElementException();     // STUB
+        if (hasNext()) {
+          if (isNew(this.cursor.getValue().getTransaction().getSource())) {
+            past = Arrays.copyOf(past, past.length + 1);
+            past[past.length - 1] = this.cursor.getValue().getTransaction().getSource();
+            return this.cursor.getValue().getTransaction().getSource();
+          } // if
+          if (isNew(this.cursor.getValue().getTransaction().getTarget())) {
+            past = Arrays.copyOf(past, past.length + 1);
+            past[past.length - 1] = this.cursor.getValue().getTransaction().getTarget();
+            return this.cursor.getValue().getTransaction().getTarget();
+          } // if
+        } // if
+        throw new NoSuchElementException();
       } // next()
+
+      private boolean isNew(String arg) {
+        for (String str : past) {
+          if (str.equals(arg)) {
+            return false;
+          } // if
+        } // for
+        return true;
+      } // isNew(String)
     };
   } // users()
 
@@ -185,9 +321,17 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public int balance(String user) {
     int bal = 0;
-    Node<Block> cursor = this.first;
-    while()
-    return 0;   // STUB
+    Iterator<Block> blocks = this.blocks();
+    while (blocks.hasNext()) {
+      Block block = blocks.next();
+      if (block.getTransaction().getSource().equals(user)) {
+        bal -= block.getTransaction().getAmount();
+      } // if
+      if (block.getTransaction().getTarget().equals(user)) {
+        bal += block.getTransaction().getAmount();
+      } // if
+    } // while
+    return bal;
   } // balance()
 
   /**
@@ -197,12 +341,23 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Block> blocks() {
     return new Iterator<Block>() {
+      Node<Block> cursor = null;
+
       public boolean hasNext() {
-        return false;   // STUB
+        return ((cursor == null) || (cursor.getNext() != null));
       } // hasNext()
 
       public Block next() {
-        throw new NoSuchElementException();     // STUB
+        if (hasNext()) {
+          if (cursor == null) {
+            cursor = first;
+          } else {
+            cursor = cursor.getNext();
+          } // if / else
+          return cursor.getValue();
+        } else {
+          throw new NoSuchElementException();
+        } // if / else
       } // next()
     };
   } // blocks()
@@ -214,12 +369,23 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
+      Node<Block> cursor = null;
+
       public boolean hasNext() {
-        return false;   // STUB
+        return ((cursor == null) || (cursor.getNext() == null));
       } // hasNext()
 
       public Transaction next() {
-        throw new NoSuchElementException();     // STUB
+        if (hasNext()) {
+          if (cursor == null) {
+            cursor = first;
+          } else {
+            cursor = cursor.getNext();
+          } // if / else
+          return cursor.getValue().getTransaction();
+        } else {
+          throw new NoSuchElementException();
+        } // if / else
       } // next()
     };
   } // iterator()

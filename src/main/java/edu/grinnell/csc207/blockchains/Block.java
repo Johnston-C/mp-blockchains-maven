@@ -16,13 +16,13 @@ public class Block {
   // | Fields |
   // +--------+
 
-  /** The number of the block */
+  /** The number of the block. */
   private int num;
 
   /** This is the transaction of the block.*/
   Transaction transaction;
 
-  /** This is the Previous hash of the block*/
+  /** This is the Previous hash of the block. */
   private Hash prevHash;
 
   /** This is the block's own hash. */
@@ -31,10 +31,10 @@ public class Block {
   /** This is the nonce of the block. */
   long nonce;
 
-  /** An int buffer for the computeHash. */
+  /** A byte buffer used for ints. */
   private ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
 
-  /** A byte buffer used for longs */
+  /** A byte buffer used for longs. */
   private ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
 
   // +--------------+------------------------------------------------
@@ -66,7 +66,6 @@ public class Block {
       this.nonce++;
       this.computeHash();
     } // while
-    // STUB
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
@@ -101,7 +100,7 @@ public class Block {
    * @return
    *   The integer as bytes.
    */
-  private byte[] intAsBytes(int n){
+  private byte[] intAsBytes(int n) {
     intBuffer.clear();
     return intBuffer.putInt(n).array();
   } // intAsBytes(int)
@@ -114,7 +113,7 @@ public class Block {
    * @return
    *   The long as bytes.
    */
-  private byte[] longAsBytes(long n){
+  private byte[] longAsBytes(long n) {
     longBuffer.clear();
     return longBuffer.putLong(n).array();
   } // longAsBytes(long)
@@ -126,10 +125,10 @@ public class Block {
   private void computeHash() {
     MessageDigest md = null;
     try {
-        md = MessageDigest.getInstance("sha-256");
+      md = MessageDigest.getInstance("sha-256");
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Cannot load algorithm");
-    }
+    } // try / catch
     md.update(intAsBytes(this.getNum()));
     md.update(this.getTransaction().getSource().getBytes());
     md.update(this.getTransaction().getTarget().getBytes());
@@ -196,13 +195,15 @@ public class Block {
   @Override
   public String toString() {
     String output = "Block " + this.num + " (Transaction: [";
-    if(this.transaction.getSource().equals("")){
+    if (this.transaction.getSource().equals("")) {
       output += "Deposit, ";
     } else {
       output += "Source: " + this.transaction.getSource() + ", ";
-    } //end of else case
-    output += "Target " + this.transaction.getTarget() + ", Amount: " + this.transaction.getAmount();
-    output += "], Nonce: " + this.nonce + ", prevHash: " + this.prevHash + ", hash: " + this.ownHash;
+    } // if / else
+    output += "Target " + this.transaction.getTarget();
+    output += ", Amount: " + this.transaction.getAmount();
+    output += "], Nonce: " + this.nonce + ", prevHash: ";
+    output += this.prevHash + ", hash: " + this.ownHash;
     return output;
   } // toString()
 } // class Block
