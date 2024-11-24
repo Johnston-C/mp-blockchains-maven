@@ -1,8 +1,8 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Arrays;
 
 /**
  * A full blockchain.
@@ -35,14 +35,14 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Create a new blockchain using a validator to check elements.
    *
-   * @param check
-   *   The validator used to check elements.
+   * @param check The validator used to check elements.
    */
   public BlockChain(HashValidator check) {
     this.size = 1;
     this.checker = check;
-    this.first = new Node<Block>(new Block(0, new Transaction("", "", 0),
-        new Hash(new byte[] {}), this.checker));
+    this.first =
+        new Node<Block>(
+            new Block(0, new Transaction("", "", 0), new Hash(new byte[] {}), this.checker));
     this.last = this.first;
   } // BlockChain(HashValidator)
 
@@ -53,14 +53,13 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Determine if a block's hash is incorrect, based on the fields it has.
    *
-   * @param blk
-   *   The block to check.
-   * @return
-   *   If the block's hash is incorrect.
+   * @param blk The block to check.
+   * @return If the block's hash is incorrect.
    */
   private boolean hashIncorrect(Block blk) {
-    return (!(new Block(blk.getNum(), blk.getTransaction(),
-        blk.getPrevHash(), blk.getNonce())).getHash().equals(blk.getHash()));
+    return (!(new Block(blk.getNum(), blk.getTransaction(), blk.getPrevHash(), blk.getNonce()))
+        .getHash()
+        .equals(blk.getHash()));
   } // boolean
 
   // +---------+-----------------------------------------------------
@@ -68,12 +67,9 @@ public class BlockChain implements Iterable<Transaction> {
   // +---------+
 
   /**
-   * Mine for a new valid block for the end of the chain, returning that
-   * block.
+   * Mine for a new valid block for the end of the chain, returning that block.
    *
-   * @param t
-   *   The transaction that goes in the block.
-   *
+   * @param t The transaction that goes in the block.
    * @return a new block with correct number, hashes, and such.
    */
   public Block mine(Transaction t) {
@@ -92,12 +88,9 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Add a block to the end of the chain.
    *
-   * @param blk
-   *   The block to add to the end of the chain.
-   *
-   * @throws IllegalArgumentException if (a) the hash is not valid, (b)
-   *   the hash is not appropriate for the contents, or (c) the previous
-   *   hash is incorrect.
+   * @param blk The block to add to the end of the chain.
+   * @throws IllegalArgumentException if (a) the hash is not valid, (b) the hash is not appropriate
+   *     for the contents, or (c) the previous hash is incorrect.
    */
   public void append(Block blk) {
     if (checker.isValid(blk.getHash())) {
@@ -120,9 +113,8 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Attempt to remove the last block from the chain.
    *
-   * @return false if the chain has only one block (in which case it's
-   *   not removed) or true otherwise (in which case the last block
-   *   is removed).
+   * @return false if the chain has only one block (in which case it's not removed) or true
+   *     otherwise (in which case the last block is removed).
    */
   public boolean removeLast() {
     if (size == 1) {
@@ -149,10 +141,9 @@ public class BlockChain implements Iterable<Transaction> {
   } // getHash()
 
   /**
-   * Determine if the blockchain is correct in that (a) the balances are
-   * legal/correct at every step, (b) that every block has a correct
-   * previous hash field, (c) that every block has a hash that is correct
-   * for its contents, and (d) that every block has a valid hash.
+   * Determine if the blockchain is correct in that (a) the balances are legal/correct at every
+   * step, (b) that every block has a correct previous hash field, (c) that every block has a hash
+   * that is correct for its contents, and (d) that every block has a valid hash.
    *
    * @return true if the blockchain is correct and false otherwise.
    */
@@ -166,13 +157,11 @@ public class BlockChain implements Iterable<Transaction> {
   } // isCorrect()
 
   /**
-   * Determine if the blockchain is correct in that (a) the balances are
-   * legal/correct at every step, (b) that every block has a correct
-   * previous hash field, (c) that every block has a hash that is correct
-   * for its contents, and (d) that every block has a valid hash.
+   * Determine if the blockchain is correct in that (a) the balances are legal/correct at every
+   * step, (b) that every block has a correct previous hash field, (c) that every block has a hash
+   * that is correct for its contents, and (d) that every block has a valid hash.
    *
-   * @throws Exception
-   *   If things are wrong at any block.
+   * @throws Exception If things are wrong at any block.
    */
   public void check() throws Exception {
     int balance;
@@ -195,8 +184,8 @@ public class BlockChain implements Iterable<Transaction> {
         } // if
         if (balance < 0) {
           if ((errorIndex > block.getNum()) || (errorIndex == -1)) {
-            errorString = "User \"" + user + "\" had a negative balance after block "
-                + block.getNum() + ".";
+            errorString =
+                "User \"" + user + "\" had a negative balance after block " + block.getNum() + ".";
             errorIndex = block.getNum();
           } // if
           noError = false;
@@ -213,9 +202,12 @@ public class BlockChain implements Iterable<Transaction> {
         lastBlock = nextBlock;
       } else {
         if ((errorIndex > lastBlock.getNum()) || (errorIndex == -1)) {
-          errorString = "Block " + lastBlock.getNum()
-              + " has a prevHash that is different from block "
-              + nextBlock.getNum() + "'s ownHash.";
+          errorString =
+              "Block "
+                  + lastBlock.getNum()
+                  + " has a prevHash that is different from block "
+                  + nextBlock.getNum()
+                  + "'s ownHash.";
           errorIndex = lastBlock.getNum();
         } // if
         noError = false;
@@ -228,8 +220,8 @@ public class BlockChain implements Iterable<Transaction> {
       lastBlock = blocks.next();
       if (lastBlock.getTransaction().getAmount() < 0) {
         if ((errorIndex > lastBlock.getNum()) || (errorIndex == -1)) {
-          errorString = "Block " + lastBlock.getNum()
-              + " has a negative amount for its transaction.";
+          errorString =
+              "Block " + lastBlock.getNum() + " has a negative amount for its transaction.";
           errorIndex = lastBlock.getNum();
         } // if
         noError = false;
@@ -261,15 +253,14 @@ public class BlockChain implements Iterable<Transaction> {
   } // check()
 
   /**
-   * Return an iterator of all the people who participated in the
-   * system.
+   * Return an iterator of all the people who participated in the system.
    *
    * @return an iterator of all the people in the system.
    */
   public Iterator<String> users() {
     return new Iterator<String>() {
       Node<Block> cursor = first;
-      String[] past = new String[]{""};
+      String[] past = new String[] {""};
 
       public boolean hasNext() {
         while (this.cursor != null) {
@@ -314,9 +305,7 @@ public class BlockChain implements Iterable<Transaction> {
   /**
    * Find one user's balance.
    *
-   * @param user
-   *   The user whose balance we want to find.
-   *
+   * @param user The user whose balance we want to find.
    * @return that user's balance (or 0, if the user is not in the system).
    */
   public int balance(String user) {
@@ -394,5 +383,4 @@ public class BlockChain implements Iterable<Transaction> {
       } // next()
     };
   } // iterator()
-
 } // class BlockChain

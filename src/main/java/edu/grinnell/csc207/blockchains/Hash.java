@@ -24,8 +24,7 @@ public class Hash {
   /**
    * Create a new encapsulated hash.
    *
-   * @param data
-   *   The data to copy into the hash.
+   * @param data The data to copy into the hash.
    */
   public Hash(byte[] data) {
     this.data = Arrays.copyOf(data, data.length);
@@ -47,10 +46,7 @@ public class Hash {
   /**
    * Get the ith byte.
    *
-   * @param i
-   *   The index of the byte to get, between 0 (inclusive) and
-   *   length() (exclusive).
-   *
+   * @param i The index of the byte to get, between 0 (inclusive) and length() (exclusive).
    * @return the ith byte
    */
   public byte get(int i) {
@@ -60,8 +56,7 @@ public class Hash {
   } // get()
 
   /**
-   * Get a copy of the bytes in the hash. We make a copy so that the client
-   * cannot change them.
+   * Get a copy of the bytes in the hash. We make a copy so that the client cannot change them.
    *
    * @return a copy of the bytes in the hash.
    */
@@ -89,14 +84,11 @@ public class Hash {
   } // toString()
 
   /**
-   * Convert a number between 0 and 15 to its hex equivalent.
-   * The output is a string.
+   * Convert a number between 0 and 15 to its hex equivalent. The output is a string.
    *
-   * @param num1
-   *   The number to convert from base 10 to base 16.
-   * @return
-   *   The number converted. If the number is not between 0 and 15
-   *   (inclusive), return an empty string.
+   * @param num1 The number to convert from base 10 to base 16.
+   * @return The number converted. If the number is not between 0 and 15 (inclusive), return an
+   *     empty string.
    */
   private String numToHex(int num1) {
     switch (num1) {
@@ -140,11 +132,8 @@ public class Hash {
   /**
    * Determine if this is equal to another object.
    *
-   * @param other
-   *   The object to compare to.
-   *
-   * @return true if the two objects are conceptually equal and false
-   *   otherwise.
+   * @param other The object to compare to.
+   * @return true if the two objects are conceptually equal and false otherwise.
    */
   public boolean equals(Object other) {
     return (other instanceof Hash) && (this.equals((Hash) other));
@@ -153,11 +142,8 @@ public class Hash {
   /**
    * Determine if this is equal to another Hash.
    *
-   * @param other
-   *   The object to compare to.
-   *
-   * @return true if the two objects are conceptually equal and false
-   *   otherwise.
+   * @param other The object to compare to.
+   * @return true if the two objects are conceptually equal and false otherwise.
    */
   public boolean equals(Hash other) {
     return Arrays.equals(getBytes(), other.getBytes());

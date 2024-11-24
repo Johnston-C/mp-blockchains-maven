@@ -1,15 +1,14 @@
 package edu.grinnell.csc207.main;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Iterator;
-
 import edu.grinnell.csc207.blockchains.Block;
 import edu.grinnell.csc207.blockchains.BlockChain;
 import edu.grinnell.csc207.blockchains.HashValidator;
 import edu.grinnell.csc207.blockchains.Transaction;
 import edu.grinnell.csc207.util.IOUtils;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Iterator;
 
 /**
  * A simple UI for our BlockChain class.
@@ -23,9 +22,7 @@ public class BlockChainUI {
   // | Constants |
   // +-----------+
 
-  /**
-   * The number of bytes we validate. Should be set to 3 before submitting.
-   */
+  /** The number of bytes we validate. Should be set to 3 before submitting. */
   static final int VALIDATOR_BYTES = 0;
 
   // +---------+-----------------------------------------------------
@@ -35,11 +32,11 @@ public class BlockChainUI {
   /**
    * Print out the instructions.
    *
-   * @param pen
-   *   The pen used for printing instructions.
+   * @param pen The pen used for printing instructions.
    */
   public static void instructions(PrintWriter pen) {
-    pen.println("""
+    pen.println(
+        """
       Valid commands:
         mine: discovers the nonce for a given transaction
         append: appends a new block onto the end of the chain
@@ -60,16 +57,14 @@ public class BlockChainUI {
   /**
    * Run the UI.
    *
-   * @param args
-   *   Command-line arguments (currently ignored).
+   * @param args Command-line arguments (currently ignored).
    */
   public static void main(String[] args) throws Exception {
     PrintWriter pen = new PrintWriter(System.out, true);
     BufferedReader eyes = new BufferedReader(new InputStreamReader(System.in));
 
     // Set up our blockchain.
-    HashValidator validator =
-      (hash) -> (hash.length() >= 1) && (hash.get(0) == 0);
+    HashValidator validator = (hash) -> (hash.length() >= 1) && (hash.get(0) == 0);
     BlockChain chain = new BlockChain(validator);
 
     instructions(pen);
@@ -101,11 +96,11 @@ public class BlockChainUI {
               pen.println("Sucessfully appended a new block");
             } catch (IllegalArgumentException e) {
               pen.println(e.getMessage());
-            }
+            } //end of catch
           } else {
             pen.println("Nonce is not the expected nonce.");
-          }
-          
+          } //end of else case
+
           break;
 
         case "balance":
@@ -117,7 +112,7 @@ public class BlockChainUI {
           Iterator<Block> printableBlock = chain.blocks();
           while (printableBlock.hasNext()) {
             pen.println(printableBlock.next());
-          }
+          } //end of while loop
           break;
 
         case "check":
@@ -126,7 +121,7 @@ public class BlockChainUI {
             pen.println("No Error");
           } catch (Exception e) {
             pen.println(e.getMessage());
-          }
+          } //end of catch
           break;
 
         case "help":
@@ -146,25 +141,25 @@ public class BlockChainUI {
           break;
 
         case "remove":
-          if(chain.removeLast()){
+          if (chain.removeLast()) {
             pen.println("Block successfully removed.");
-          } else{
+          } else {
             pen.println("Failed to remove block.");
-          }
+          } //end of else case
           break;
 
         case "transactions":
           Iterator<Transaction> printableTransaction = chain.iterator();
-          while (printableTransaction.hasNext()) { 
+          while (printableTransaction.hasNext()) {
             pen.println(printableTransaction.next());
-          }
+          } //end of while loop
           break;
 
         case "users":
           Iterator<String> printableUsers = chain.users();
-          while(printableUsers.hasNext()){
+          while (printableUsers.hasNext()) {
             pen.println(printableUsers.next());
-          }
+          } //end of while loop
           break;
 
         default:
